@@ -63,6 +63,10 @@ async def predict(file: UploadFile = File(...)):
 
     except Exception as e:
         return {"error": "Internal Server Error", "message": str(e)}
+        
+@app.api_route("/", methods=["GET", "HEAD"])  # Allows both GET and HEAD requests
+async def handle_root():
+    return FileResponse("index.html")  # Serving the HTML file for both GET and HEAD requests
     
 if __name__ == "__main__":
     import uvicorn
