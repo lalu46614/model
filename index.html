@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Accident Detection</title>
+    <style>
+        /* Set the background image and full screen layout */
+        body {
+            font-family: 'Arial', sans-serif;
+            background-image: url('https://img.lovepik.com/free-png/20211119/lovepik-traffic-police-command-traffic-png-image_401048250_wh1200.png'); /* Replace with your actual image URL */
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        h1 {
+            text-align: center;
+            color: white;
+            font-size: 32px;
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.7);
+        }
+
+        .container {
+            background-color: rgba(255, 255, 255, 0.8); /* White with some transparency */
+            max-width: 600px;
+            width: 100%;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            text-align: center;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        label {
+            display: block;
+            padding: 12px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border-radius: 5px;
+            text-align: center;
+            cursor: pointer;
+            font-size: 16px;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+
+        label:hover {
+            background-color: #45a049;
+        }
+
+        .btn {
+            background-color: #007BFF;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            width: 100%;
+            cursor: pointer;
+            display: none; /* Initially hidden */
+        }
+
+        .btn:hover {
+            background-color: #0056b3;
+        }
+
+        .file-info {
+            font-size: 16px;
+            margin-top: 10px;
+            color: #555;
+        }
+
+        .loading {
+            margin-top: 20px;
+            font-size: 18px;
+            color: #FF9800;
+        }
+
+        #result {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 20px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .webcam-btn {
+            margin-top: 20px;
+            background-color: #FF5722;
+            width: 100%;
+            padding: 10px;
+            color: white;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .webcam-btn:hover {
+            background-color: #e64a19;
+        }
+
+        /* Ensure content stays centered in viewport */
+        .container {
+            position: relative;
+            z-index: 1;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Accident Detection in Video</h1>
+        <p>Upload a video to check if an accident is detected.</p>
+
+        <!-- File Upload -->
+        <label for="videoFile">Choose a video file to upload</label>
+        <input type="file" id="videoFile" accept="video/*" onchange="handleFileSelect()">
+        
+        <!-- File Info Display -->
+        <div class="file-info" id="fileInfo"></div>
+
+        <!-- Upload Button (Initially hidden, shown after file selection) -->
+        <button class="btn" id="uploadButton" onclick="uploadVideo()">Upload and Detect</button>
+
+        <!-- Webcam Button (for future use) -->
+        <button class="webcam-btn" onclick="openWebcam()">Open Webcam (Future Feature)</button>
+
+        <!-- Loading/Processing Message -->
+        <div class="loading" id="loadingMessage" style="display: none;">Processing...</div>
+
+        <!-- Result Display -->
+        <div id="result"></div>
+    </div>
+
+    <script>
+        // Show the 'Upload and Detect' button after file is selected and show the file name
+        function handleFileSelect() {
+            const fileInput = document.getElementById("videoFile");
+            const uploadButton = document.getElementById("uploadButton");
+            const fileInfo = document.getElementById("fileInfo");
+
+            const file = fileInput.files[0];
+
+            if (file) {
+                // Display file name
+                fileInfo.innerHTML = `Selected file: ${file.name}`;
+                uploadButton.style.display = 'block'; // Show the button
+            }
+        }
+
+        async function uploadVideo() {
+            const fileInput = document.getElementById("videoFile");
+            const file = fileInput.files[0];
+            const loadingMessage = document.getElementById("loadingMessage");
+
+            if (!file) {
+                alert("Please select a video file first.");
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append("file", file);
+
+            // Show processing message
+            loadingMessage.style.display = 'block';
+
+            try {
+                const response = await fetch("http://127.0.0.1:8000/predict", {
+                    method: "POST",
+                    body: formData,
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    document.getElementById("result").innerText = result.label;
+                } else {
+                    document.getElementById("result").innerText = `Error: ${result.error}`;
+                }
+            } catch (error) {
+                document.getElementById("result").innerText = "Failed to communicate with the server.";
+            } finally {
+                // Hide the processing message after completion
+                loadingMessage.style.display = 'none';
+            }
+        }
+
+        function openWebcam() {
+            alert("This feature is coming soon!");  // Placeholder for future webcam functionality
+        }
+    </script>
+
+</body>
+</html>
