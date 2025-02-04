@@ -18,7 +18,7 @@ app.add_middleware(
     allow_headers=["*"],  # Allow all headers
 )
 
-MODEL_PATH = models\best.pt"
+MODEL_PATH = "models\best.pt"
 model = YOLO(MODEL_PATH).to('cpu')  # Force CPU mode for debugging
 
 @app.get("/", response_class=HTMLResponse)
