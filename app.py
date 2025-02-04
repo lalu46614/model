@@ -18,7 +18,7 @@ app.add_middleware(
     allow_headers=["*"],  # Allow all headers
 )
 
-MODEL_PATH = "models\best.pt"
+MODEL_PATH = "models/best.pt"
 model = YOLO(MODEL_PATH).to('cpu')  # Force CPU mode for debugging
 
 @app.get("/", response_class=HTMLResponse)
@@ -62,4 +62,9 @@ async def predict(file: UploadFile = File(...)):
         return {"label": "Accident Detected" if accident_detected else "No Accident"}
 
     except Exception as e:
+        return {"error": "Internal Server Error", "message": str(e)}
+    
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=10000)
         return {"error": "Internal Server Error", "message": str(e)}
